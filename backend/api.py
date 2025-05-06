@@ -117,7 +117,7 @@ if config.ENV_MODE == EnvMode.STAGING:
     
 # Add local-specific origins
 if config.ENV_MODE == EnvMode.LOCAL:
-    allowed_origins.append("http://localhost:3000")
+    allowed_origins.extend(["http://localhost:3000", "http://localhost:3001"])
 
 app.add_middleware(
     CORSMiddleware,

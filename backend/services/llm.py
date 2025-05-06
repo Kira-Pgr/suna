@@ -47,6 +47,11 @@ def setup_api_keys() -> None:
         else:
             logger.warning(f"No API key found for provider: {provider}")
 
+    # Set up OpenAI API base if configured
+    if config.OPENAI_API_KEY and config.OPENAI_API_BASE:
+        os.environ['OPENAI_API_BASE'] = config.OPENAI_API_BASE
+        logger.debug(f"Set OPENAI_API_BASE to {config.OPENAI_API_BASE}")
+
     # Set up OpenRouter API base if not already set
     if config.OPENROUTER_API_KEY and config.OPENROUTER_API_BASE:
         os.environ['OPENROUTER_API_BASE'] = config.OPENROUTER_API_BASE
@@ -148,6 +153,16 @@ def prepare_params(
                 extra_headers["X-Title"] = app_name
             params["extra_headers"] = extra_headers
             logger.debug(f"Added OpenRouter site URL and app name to headers")
+
+    # Add OpenAI-specific parameters
+    if model_name.startswith("openai/"):
+        logger.debug(f"Preparing OpenAI parameters for model: {model_name}")
+
+        # Add API base URL if configured but not already set in params
+        if config.OPENAI_API_BASE and "api_base" not in params:
+            params["api_base"] = config.OPENAI_API_BASE
+            logger.debug(
+                f"Using configured OpenAI API base: {config.OPENAI_API_BASE}")
 
     # Add Bedrock-specific parameters
     if model_name.startswith("bedrock/"):
